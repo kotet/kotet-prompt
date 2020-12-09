@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"os/user"
@@ -16,10 +17,29 @@ import (
 
 const fallback string = "$ "
 
+var socket_file string = "/tmp/kotet-prompt.sock"
+
 func main() {
+	wg := &sync.WaitGroup{}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		conn, err := net.Dial("unix", socket_file)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		defer conn.Close()
+		err = conn.(*net.UnixConn).CloseWrite()
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+	}()
+
 	return_code := flag.Int("return", 0, "return code")
 	flag.Parse()
-	wg := &sync.WaitGroup{}
 	var buf bytes.Buffer
 	var clock, pwd, git, ret string
 	wg.Add(1)
