@@ -78,7 +78,7 @@ func main() {
 		buf.WriteByte(' ')
 		buf.WriteString(Color(ret, "91"))
 	}
-	fmt.Printf("\033[4m\033[1m%s\n\033[0m$ ", buf.String())
+	fmt.Printf("\033[4m\033[1m%s\033[0m\n$ ", buf.String())
 }
 
 func Color(str string, code string) string {
